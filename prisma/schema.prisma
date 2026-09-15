@@ -1,0 +1,208 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum AppointmentSource {
+  BOT
+  ADMIN
+}
+
+// Mijoz (bemor)
+model User {
+  id                    Int           @id @default(autoincrement())
+  telegramId            String?       @unique
+  username              String?
+  firstName             String
+  lastName              String?
+  phone                 String?
+  language              String        @default("uz")
+  birthDate             String?
+  notes                 String?
+  onboarded             Boolean       @default(false)
+  isBlocked             Boolean       @default(false)
+  isDemo                Boolean       @default(false)
+  lastVisitAt           DateTime?
+  lastCheckupReminderAt DateTime?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  appointments          Appointment[]
+
+  @@index([phone])
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  nameUz    String
+  nameRu    String
+  icon      String?
+  sortOrder Int       @default(0)
+  services  Service[]
+}
+
+model Service {
+  id            Int           @id @default(autoincrement())
+  categoryId    Int?
+  nameUz        String
+  nameRu        String
+  descriptionUz String?
+  descriptionRu String?
+  aftercareUz   String?
+  aftercareRu   String?
+  price         Int           @default(0)
+  oldPrice      Int?
+  priceFrom     Boolean       @default(false)
+  durationMin   Int           @default(30)
+  imageUrl      String?
+  isPopular     Boolean       @default(false)
+  isActive      Boolean       @default(true)
+  sortOrder     Int           @default(0)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  category      Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  doctors       Doctor[]
+  appointments  Appointment[]
+}
+
+model Doctor {
+  id              Int           @id @default(autoincrement())
+  fullName        String
+  specialtyUz     String
+  specialtyRu     String
+  bioUz           String?
+  bioRu           String?
+  photoUrl        String?
+  experienceYears Int           @default(0)
+  color           String        @default("#2563eb")
+  schedule        Json
+  isActive        Boolean       @default(true)
+  sortOrder       Int           @default(0)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  services        Service[]
+  appointments    Appointment[]
+  timeOffs        TimeOff[]
+}
+
+// Dam olish kunlari / ta'til. doctorId bo'sh bo'lsa — butun klinika uchun
+model TimeOff {
+  id        Int      @id @default(autoincrement())
+  doctorId  Int?
+  dateFrom  String
+  dateTo    String
+  reason    String?
+  createdAt DateTime @default(now())
+  doctor    Doctor?  @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+}
+
+model Appointment {
+  id               Int               @id @default(autoincrement())
+  userId           Int
+  doctorId         Int
+  serviceId        Int?
+  date             String
+  startTime        String
+  endTime          String
+  startAt          DateTime
+  endAt            DateTime
+  status           AppointmentStatus @default(PENDING)
+  source           AppointmentSource @default(BOT)
+  complaint        String?
+  adminNote        String?
+  diagnosis        String?
+  recommendation   String?
+  price            Int?
+  rating           Int?
+  feedback         String?
+  cancelReason     String?
+  cancelledBy      String?
+  reminderDaySent  Boolean           @default(false)
+  reminderHourSent Boolean           @default(false)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  doctor           Doctor            @relation(fields: [doctorId], references: [id], onDelete: Restrict)
+  service          Service?          @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  notifications    Notification[]
+
+  @@index([doctorId, date])
+  @@index([userId])
+  @@index([startAt])
+  @@index([status])
+}
+
+// Klinika sozlamalari (bitta qator, id = 1)
+model Clinic {
+  id                    Int      @id @default(1)
+  name                  String
+  phone                 String
+  phone2                String?
+  addressUz             String
+  addressRu             String
+  landmarkUz            String?
+  landmarkRu            String?
+  latitude              Float?
+  longitude             Float?
+  workingHoursUz        String
+  workingHoursRu        String
+  aboutUz               String?
+  aboutRu               String?
+  instagram             String?
+  telegram              String?
+  slotStepMin           Int      @default(30)
+  bookingDaysAhead      Int      @default(30)
+  minLeadMinutes        Int      @default(60)
+  cancelLimitHours      Int      @default(3)
+  autoConfirm           Boolean  @default(false)
+  remindDayBefore       Boolean  @default(true)
+  remindHoursBefore     Boolean  @default(true)
+  checkupEnabled        Boolean  @default(true)
+  checkupIntervalMonths Int      @default(6)
+  updatedAt             DateTime @updatedAt
+}
+
+model Admin {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  passwordHash String
+  fullName     String
+  createdAt    DateTime @default(now())
+}
+
+// Admin Panel uchun real vaqt bildirishnomalari
+model Notification {
+  id            Int          @id @default(autoincrement())
+  type          String
+  appointmentId Int?
+  isRead        Boolean      @default(false)
+  createdAt     DateTime     @default(now())
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+}
+
+model Broadcast {
+  id        Int      @id @default(autoincrement())
+  textUz    String
+  textRu    String
+  total     Int      @default(0)
+  sent      Int      @default(0)
+  failed    Int      @default(0)
+  status    String   @default("SENDING")
+  createdBy String?
+  createdAt DateTime @default(now())
+}

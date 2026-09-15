@@ -1,0 +1,145 @@
+module.exports = {
+  code: 'uz',
+  months: ['yanvar', 'fevral', 'mart', 'aprel', 'may', 'iyun', 'iyul', 'avgust', 'sentabr', 'oktabr', 'noyabr', 'dekabr'],
+  weekdays: ['yakshanba', 'dushanba', 'seshanba', 'chorshanba', 'payshanba', 'juma', 'shanba'],
+  date: (day, month, weekday, year) => `${year ? `${year}-yil ` : ''}${day}-${month}${weekday ? `, ${weekday}` : ''}`,
+  price: (amount, from) => `${amount} so'm${from ? 'dan' : ''}`,
+  free: 'Bepul',
+  today: 'bugun',
+  tomorrow: 'ertaga',
+
+  status: {
+    PENDING: '⏳ Tasdiqlash kutilmoqda',
+    CONFIRMED: '✅ Tasdiqlangan',
+    COMPLETED: '🦷 Yakunlangan',
+    CANCELLED: '❌ Bekor qilingan',
+    NO_SHOW: '⚠️ Kelmagan',
+  },
+
+  languageChosen: "✅ Til tanlandi: O'zbekcha",
+  askPhone: (name) =>
+    `Assalomu alaykum, <b>${name}</b>! 👋\n\nQabulga yozilish va eslatmalarni olish uchun telefon raqamingizni yuboring. Buning uchun pastdagi tugmani bosing 👇`,
+  sharePhoneBtn: '📱 Telefon raqamni yuborish',
+  phoneNotOwn: "⚠️ Iltimos, pastdagi tugma orqali o'zingizning raqamingizni yuboring.",
+  welcome: (name, clinic) =>
+    `🦷 <b>${clinic}</b> klinikasiga xush kelibsiz, ${name}!\n\nBu bot orqali siz:\n• shifokor kalendaridan qulay kun va vaqtni tanlab, qabulga yozilasiz;\n• xizmatlar va narxlar bilan tanishasiz;\n• davolanish tarixingizni kuzatib borasiz;\n• qabul va profilaktik ko'rik haqida eslatmalar olasiz.\n\nKerakli bo'limni pastdagi menyudan tanlang 👇`,
+  openAppHint: "📱 Ilovada hammasi yanada qulay: shifokorlar kalendari, qabullaringiz va davolanish tarixi bir joyda.",
+  menuHint: "Kerakli bo'limni pastdagi menyudan tanlang 👇",
+  menuButton: 'Ilova',
+
+  menu: {
+    book: '📅 Qabulga yozilish',
+    appointments: '🗓 Mening qabullarim',
+    services: '🦷 Xizmatlar va narxlar',
+    doctors: '👨‍⚕️ Shifokorlar',
+    history: '📋 Davolanish tarixi',
+    contacts: '📍 Manzil va aloqa',
+    language: "🌐 Tilni o'zgartirish",
+  },
+
+  btn: {
+    openApp: '📱 Ilovani ochish',
+    book: '📅 Qabulga yozilish',
+    bookCheckup: "📅 Ko'rikka yozilish",
+    rebook: '📅 Qayta yozilish',
+    myAppointments: '🗓 Mening qabullarim',
+    history: '📋 Batafsil tarix',
+    cancel: '❌ Bekor qilish',
+    yesCancel: '✅ Ha, bekor qilinsin',
+    no: "↩️ Yo'q",
+    attend: '✅ Albatta boraman',
+    map: "📍 Xaritada ko'rish",
+    instagram: '📸 Instagram',
+    telegram: '✈️ Telegram kanal',
+  },
+
+  bookIntro: "Shifokorni, kunni va o'zingizga qulay vaqtni tanlash uchun tugmani bosing 👇",
+  noWebApp: (phone) =>
+    `📞 Qabulga yozilish uchun klinikaga qo'ng'iroq qiling: <b>${phone}</b>\n\n<i>Onlayn yozilish tez orada ishga tushadi.</i>`,
+
+  upcomingTitle: '🗓 <b>Kelgusi qabullaringiz</b>',
+  noUpcoming: "Sizda hozircha rejalashtirilgan qabul yo'q.",
+  historyTitle: '📋 <b>Davolanish tarixingiz</b>',
+  noHistory: "Davolanish tarixingiz hozircha bo'sh. Birinchi tashrifdan so'ng bu yerda ko'rinadi.",
+  servicesTitle: '🦷 <b>Xizmatlar va narxlar</b>',
+  servicesNote: "<i>Aniq narx shifokor ko'rigidan so'ng belgilanadi.</i>",
+  doctorsTitle: '👨‍⚕️ <b>Shifokorlarimiz</b>',
+  experience: (years) => `${years} yillik tajriba`,
+  reviews: (avg, count) => `⭐ ${avg} (${count} ta baho)`,
+
+  labels: {
+    date: '📅 Sana',
+    time: '🕐 Vaqt',
+    doctor: '👨‍⚕️ Shifokor',
+    service: '🦷 Xizmat',
+    address: '📍 Manzil',
+    landmark: "🧭 Mo'ljal",
+    phone: '📞 Telefon',
+    hours: '🕘 Ish vaqti',
+    status: 'Holati',
+    diagnosis: '📝 Xulosa',
+    recommendation: '💡 Tavsiya',
+    price: "💰 To'lov",
+    reason: '💬 Sabab',
+    consultation: "Ko'rik",
+  },
+
+  notify: {
+    created: '✅ <b>Siz qabulga yozildingiz!</b>',
+    createdByAdmin: '📅 <b>Siz klinikamizda qabulga yozildingiz</b>',
+    pendingNote: 'Administrator tez orada qabulingizni tasdiqlaydi.',
+    remindNote: "🔔 Qabuldan 1 kun va 2 soat oldin eslatib qo'yamiz.",
+    confirmed: '✅ <b>Qabulingiz tasdiqlandi!</b>',
+    confirmedNote: 'Sizni kutamiz 😊',
+    cancelledByAdmin: '❌ <b>Qabulingiz bekor qilindi</b>',
+    cancelledNote: 'Boshqa qulay vaqtga yozilish uchun quyidagi tugmani bosing.',
+    rescheduled: "🔄 <b>Qabulingiz vaqti o'zgartirildi</b>",
+    reminderDay: (when) => `⏰ <b>Eslatma: ${when} qabulingiz bor!</b>`,
+    reminderDayNote:
+      "Iltimos, kelishingizni tasdiqlang. Rejalaringiz o'zgargan bo'lsa, qabulni bekor qiling — bu vaqtni boshqa bemorga beramiz.",
+    reminderHour: '⏰ <b>Qabulingizga oz qoldi!</b>',
+    reminderHourNote: "Iltimos, 10 daqiqa oldinroq keling. Sog'ligingiz — bizning g'amimiz 🦷",
+    completed: (name) => `🦷 <b>Qabulingiz yakunlandi!</b>\nTashrifingiz uchun rahmat, ${name}!`,
+    aftercare: "📌 <b>Parvarish bo'yicha maslahatlar:</b>",
+    rateAsk: '⭐ Iltimos, xizmatimizni baholang:',
+    checkupTitle: "🦷 <b>Profilaktik ko'rik vaqti keldi!</b>",
+    checkupSince: (name, months) => `Assalomu alaykum, ${name}! Oxirgi tashrifingizdan beri ${months} oy o'tdi.`,
+    checkupGeneric: (name) => `Assalomu alaykum, ${name}!`,
+    checkupWhy:
+      "Stomatologlar har 6 oyda ko'rikdan o'tishni tavsiya qiladi: muammo erta aniqlansa, davolash oson, tez va arzonroq bo'ladi.",
+    tipTitle: '💡 <b>Foydali maslahat:</b>',
+    checkupCta: 'Qulay vaqtni tanlab, hoziroq yoziling 👇',
+    fromClinic: (clinic) => `💬 <b>${clinic}</b> klinikasidan xabar:`,
+  },
+
+  cancelAsk: '❓ Qabulni rostdan ham bekor qilasizmi?',
+  cancelDone: '❌ Qabul bekor qilindi.',
+  cancelKept: '👍 Qabul saqlab qolindi.',
+  cancelTooLate: (hours, phone) =>
+    `Qabulga ${hours} soatdan kam vaqt qoldi. Bekor qilish uchun klinikaga qo'ng'iroq qiling: ${phone}`,
+  notAvailable: "Bu qabul topilmadi yoki uni o'zgartirib bo'lmaydi.",
+  attendThanks: '✅ Rahmat! Sizni kutamiz 😊',
+  rateThanks: (stars) => `Rahmat! Sizning bahoyingiz: ${stars}`,
+  feedbackAsk: "✍️ Xohlasangiz, fikr-mulohazangizni bitta xabarda yozib qoldiring — bu biz uchun juda muhim.",
+  feedbackThanks: '🙏 Fikringiz uchun rahmat! Uni albatta inobatga olamiz.',
+
+  commands: {
+    start: 'Botni qayta ishga tushirish',
+    lang: "Tilni o'zgartirish",
+  },
+
+  botDescription: (clinic) =>
+    `🦷 ${clinic} stomatologiya klinikasining rasmiy boti.\n\n📅 Onlayn qabulga yozilish\n🦷 Xizmatlar va narxlar\n📋 Davolanish tarixi\n🔔 Qabul va ko'rik eslatmalari\n\nBoshlash uchun «Start» tugmasini bosing.`,
+  botShortDescription: (clinic) => `🦷 ${clinic}: onlayn qabulga yozilish, narxlar va eslatmalar`,
+
+  tips: [
+    'Tishlarni kuniga 2 marta, kamida 2 daqiqa davomida yuving.',
+    "Tish cho'tkasini har 3 oyda yoki shamollashdan keyin almashtiring.",
+    "Tish ipi (floss) tishlar orasidagi qoldiqlarni cho'tkadan ko'ra yaxshiroq tozalaydi.",
+    "Shirinlik va gazli ichimliklardan keyin og'izni toza suv bilan chayqang.",
+    'Milk qonashi — shifokorga murojaat qilish uchun jiddiy sabab.',
+    "Yong'oq, muz va qattiq narsalarni tish bilan chaqmang — emal darz ketishi mumkin.",
+    'Yiliga 1–2 marta professional gigiena tish toshi va karies xavfini ancha kamaytiradi.',
+    "Tish og'rig'ini dori bilan bosib yurmang — kichik karies tezda kattalashadi.",
+  ],
+};

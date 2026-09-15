@@ -1,0 +1,14 @@
+# Qator oxirlarini bir xil saqlash
+* text=auto
+
+# Windows buyruq fayllari faqat CRLF bilan to'g'ri ishlaydi
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Ikkilik fayllar
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.exe binary

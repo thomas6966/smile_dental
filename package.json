@@ -1,0 +1,42 @@
+{
+  "name": "dental-clinic",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Stomatologiya klinikasi: Telegram bot, Mini App va Admin Panel",
+  "main": "src/index.js",
+  "workspaces": [
+    "mini-app",
+    "admin-panel"
+  ],
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "concurrently -k -n api,mini,admin -c blue,green,magenta \"node --watch src/index.js\" \"npm run dev -w mini-app\" \"npm run dev -w admin-panel\"",
+    "build": "npm run build -w mini-app && npm run build -w admin-panel",
+    "db:migrate": "prisma migrate deploy",
+    "db:generate": "prisma generate",
+    "seed": "node prisma/seed.js",
+    "setup": "prisma migrate deploy && prisma generate && node prisma/seed.js && npm run build"
+  },
+  "dependencies": {
+    "@ngrok/ngrok": "^1.7.0",
+    "@prisma/client": "~6.19.3",
+    "compression": "^1.8.2",
+    "express": "^5.2.1",
+    "grammy": "^1.46.0",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.4.0",
+    "prisma": "~6.19.3"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5"
+  },
+  "engines": {
+    "node": ">=20.19"
+  },
+  "allowScripts": {
+    "@prisma/client": true,
+    "prisma": true,
+    "@prisma/engines": true,
+    "esbuild": true
+  }
+}
