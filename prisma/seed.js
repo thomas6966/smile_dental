@@ -345,8 +345,8 @@ async function wipe() {
   await prisma.clinic.deleteMany();
 }
 
-function buildDemoAppointments({ doctors, services, patients }) {
-  const random = createRandom(20260915);
+function buildDemoAppointments({ doctors, patients, seed = 20260915 }) {
+  const random = createRandom(seed);
   const pickOne = (list) => list[Math.floor(random() * list.length)];
   const now = new Date();
   const today = time.nowLocal().date;
@@ -358,7 +358,8 @@ function buildDemoAppointments({ doctors, services, patients }) {
     const schedule = doctor.schedule[time.weekday(date)];
     if (!schedule?.on) return;
 
-    const service = pickOne(services.filter((s) => s.doctorKeys.includes(doctor.key)));
+    if (!doctor.serviceList?.length) return;
+    const service = pickOne(doctor.serviceList);
     const duration = service.durationMin;
     const start = time.toMinutes(schedule.start);
     const end = time.toMinutes(schedule.end);
@@ -508,7 +509,11 @@ async function seedIfEmpty({ force = false } = {}) {
   const patients = await prisma.user.findMany({ where: { isDemo: true } });
 
   // Namuna qabullar
-  const appointments = buildDemoAppointments({ doctors, services, patients });
+  const withServices = doctors.map((doctor) => ({
+    ...doctor,
+    serviceList: services.filter((s) => s.doctorKeys.includes(doctor.key)),
+  }));
+  const appointments = buildDemoAppointments({ doctors: withServices, patients });
   await prisma.appointment.createMany({ data: appointments });
 
   for (const patient of patients) {
@@ -545,16 +550,85 @@ async function seedIfEmpty({ force = false } = {}) {
   return true;
 }
 
+// Faqat namuna (demo) bemorlar va ularning qabullarini bugungi sanalarga yangilaydi.
+// Klinika sozlamalari, xizmatlar, shifokorlar va haqiqiy mijozlar tegilmaydi.
+async function refreshDemo() {
+  const doctors = await prisma.doctor.findMany({
+    where: { isActive: true },
+    orderBy: { sortOrder: 'asc' },
+    include: { services: { where: { isActive: true } } },
+  });
+  const usable = doctors.filter((d) => d.services.length).map((d) => ({ ...d, serviceList: d.services }));
+  if (!usable.length) throw new Error("Faol shifokor yoki xizmat topilmadi — avval ularni qo'shing");
+
+  const removed = await prisma.user.deleteMany({ where: { isDemo: true } });
+  await prisma.user.createMany({
+    data: PATIENTS.map(([firstName, lastName, phone, language], i) => ({
+      firstName,
+      lastName,
+      phone,
+      language,
+      isDemo: true,
+      createdAt: new Date(Date.now() - (90 - i * 5) * 86400000),
+    })),
+  });
+  const patients = await prisma.user.findMany({ where: { isDemo: true } });
+
+  const today = time.nowLocal().date;
+  const rows = buildDemoAppointments({ doctors: usable, patients, seed: Number(today.replace(/-/g, '')) });
+  await prisma.appointment.createMany({ data: rows });
+
+  for (const patient of patients) {
+    const last = await prisma.appointment.findFirst({
+      where: { userId: patient.id, status: 'COMPLETED' },
+      orderBy: { startAt: 'desc' },
+    });
+    await prisma.user.update({ where: { id: patient.id }, data: { lastVisitAt: last ? last.startAt : null } });
+  }
+
+  const recent = await prisma.appointment.findMany({
+    where: { source: 'BOT', status: 'PENDING', startAt: { gte: new Date() } },
+    orderBy: { startAt: 'asc' },
+    take: 3,
+  });
+  for (const a of recent) {
+    await prisma.notification.create({ data: { type: 'NEW_BOOKING', appointmentId: a.id } });
+  }
+
+  // Namuna ta'til kunlarini ham bugungi sanaga ko'chiramiz
+  await prisma.timeOff.deleteMany({ where: { reason: 'Malaka oshirish kursi' } });
+  const doctorForLeave = usable[1] || usable[0];
+  await prisma.timeOff.create({
+    data: {
+      doctorId: doctorForLeave.id,
+      dateFrom: time.addDays(today, 14),
+      dateTo: time.addDays(today, 16),
+      reason: 'Malaka oshirish kursi',
+    },
+  });
+
+  return { removed: removed.count, patients: patients.length, appointments: rows.length };
+}
+
 if (require.main === module) {
   const force = process.argv.includes('--force');
-  seedIfEmpty({ force })
-    .then((done) => {
-      console.log(
-        done
-          ? "✅ Namuna ma'lumotlar bazaga yozildi"
-          : "ℹ️  Bazada ma'lumotlar allaqachon bor. Hammasini qaytadan yozish uchun: npm run seed -- --force",
+  const demoOnly = process.argv.includes('--demo');
+
+  const run = demoOnly
+    ? refreshDemo().then((r) =>
+        console.log(
+          `✅ Namuna ma'lumotlar yangilandi: ${r.patients} ta bemor, ${r.appointments} ta qabul (eski namunalar o'chirildi: ${r.removed})`,
+        ),
+      )
+    : seedIfEmpty({ force }).then((done) =>
+        console.log(
+          done
+            ? "✅ Namuna ma'lumotlar bazaga yozildi"
+            : "ℹ️  Bazada ma'lumotlar allaqachon bor. Namunalarni bugungi sanalarga yangilash: npm run seed:demo",
+        ),
       );
-    })
+
+  run
     .catch((err) => {
       console.error('❌ Seed xatosi:', err);
       process.exitCode = 1;
@@ -562,4 +636,4 @@ if (require.main === module) {
     .finally(() => prisma.$disconnect());
 }
 
-module.exports = { seedIfEmpty };
+module.exports = { seedIfEmpty, refreshDemo };
