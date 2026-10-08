@@ -42,14 +42,22 @@ app.use('/uploads', express.static(config.paths.uploads, { maxAge: '7d' }));
 
 registerBotRoutes();
 if (config.botMode === 'webhook') {
-  app.post(
-    WEBHOOK_PATH,
-    webhookCallback(bot, 'express', {
-      secretToken: config.webhookSecret,
-      onTimeout: 'return',
-      timeoutMilliseconds: 25000,
-    }),
-  );
+  const handleTelegram = webhookCallback(bot, 'express', {
+    secretToken: config.webhookSecret,
+    onTimeout: 'return',
+    timeoutMilliseconds: 25000,
+  });
+  // Webhook rejimida grammY xatolarni o'zi ushlamaydi: Telegram'ga baribir 200 qaytaramiz,
+  // aks holda u xabarni qayta-qayta yuboraveradi
+  app.post(WEBHOOK_PATH, async (req, res, next) => {
+    try {
+      await handleTelegram(req, res, next);
+    } catch (err) {
+      const reason = err?.error?.description || err?.message || String(err);
+      console.error('Telegram xabarini qayta ishlashda xatolik:', reason);
+      if (!res.headersSent) res.status(200).end();
+    }
+  });
 }
 
 app.use('/api', publicRoutes);
