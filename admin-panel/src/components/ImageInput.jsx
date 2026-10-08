@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { ImageUp, X } from 'lucide-react';
-import { api } from '../api.js';
+import { api, assetUrl } from '../api.js';
 import { Spinner, useUI } from '../ui.jsx';
 
 export default function ImageInput({ value, onChange, label = 'Rasm' }) {
@@ -29,7 +29,7 @@ export default function ImageInput({ value, onChange, label = 'Rasm' }) {
     <div className="field">
       <label>{label}</label>
       <div className="row">
-        {value ? <img className="image-preview" src={value} alt="" /> : <div className="image-preview" />}
+        {value ? <img className="image-preview" src={assetUrl(value)} alt="" /> : <div className="image-preview" />}
         <div className="grow stack" style={{ gap: 6 }}>
           <input className="input" placeholder="https://... yoki faylni yuklang" value={value || ''} onChange={(e) => onChange(e.target.value)} />
           <div className="row">

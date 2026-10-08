@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { CircleAlert, CircleCheck, Info, LoaderCircle, X } from 'lucide-react';
+import { assetUrl } from './api.js';
 import { initials, REFRESH_EVENT, SOURCE, STATUS } from './utils.js';
 
 // ======================= Toast va tasdiqlash oynasi =======================
@@ -191,7 +192,7 @@ export function Toggle({ checked, onChange, label, disabled }) {
 }
 
 export function Avatar({ name = '', photo, color = '#2563eb', size = 36 }) {
-  if (photo) return <img className="avatar" src={photo} alt={name} style={{ width: size, height: size }} />;
+  if (photo) return <img className="avatar" src={assetUrl(photo)} alt={name} style={{ width: size, height: size }} />;
   return (
     <span className="avatar" style={{ width: size, height: size, background: `${color}1f`, color, fontSize: Math.round(size * 0.36) }}>
       {initials(name) || '?'}

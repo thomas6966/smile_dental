@@ -973,5 +973,9 @@ exports.changePassword = async (req, res) => {
 
 exports.upload = async (req, res) => {
   if (!req.file) throw new HttpError(400, 'Faqat rasm fayllari (JPG, PNG, WEBP) qabul qilinadi');
-  res.status(201).json({ url: `/uploads/${req.file.filename}` });
+  const media = await prisma.media.create({
+    data: { mimeType: req.file.mimetype, size: req.file.size, data: req.file.buffer },
+    select: { id: true },
+  });
+  res.status(201).json({ url: `/api/media/${media.id}` });
 };

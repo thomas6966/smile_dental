@@ -1,5 +1,14 @@
 const TOKEN_KEY = 'clinic-admin-token';
 
+// Vercel'da backend boshqa manzilda (Render) turadi; kompyuterda esa bo'sh — o'sha server
+const API_BASE = String(import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
+
+// Serverda saqlangan rasmlar uchun to'liq manzil
+export function assetUrl(url) {
+  if (!url) return '';
+  return url.startsWith('/') ? `${API_BASE}${url}` : url;
+}
+
 export function getToken() {
   try {
     return localStorage.getItem(TOKEN_KEY);
@@ -41,7 +50,7 @@ export async function api(path, { method = 'GET', body, form } = {}) {
 
   let response;
   try {
-    response = await fetch(`/api/admin${path}`, { method, headers, body: payload });
+    response = await fetch(`${API_BASE}/api/admin${path}`, { method, headers, body: payload });
   } catch {
     throw new ApiError('NETWORK', "Server bilan aloqa yo'q. Dastur ishga tushirilganini tekshiring");
   }

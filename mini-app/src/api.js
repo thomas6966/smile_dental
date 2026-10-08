@@ -1,5 +1,14 @@
 import { initData } from './telegram.js';
 
+// Vercel'da backend boshqa manzilda (Render) turadi; kompyuterda esa bo'sh — o'sha server
+const API_BASE = String(import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
+
+// Serverda saqlangan rasmlar uchun to'liq manzil
+export function assetUrl(url) {
+  if (!url) return '';
+  return url.startsWith('/') ? `${API_BASE}${url}` : url;
+}
+
 export class ApiError extends Error {
   constructor(code, message, status = 0, data = {}) {
     super(message || code);
@@ -12,7 +21,7 @@ export class ApiError extends Error {
 export async function api(path, { method = 'GET', body } = {}) {
   let response;
   try {
-    response = await fetch(`/api/client${path}`, {
+    response = await fetch(`${API_BASE}/api/client${path}`, {
       method,
       headers: {
         'Content-Type': 'application/json',

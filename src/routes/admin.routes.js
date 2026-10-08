@@ -1,25 +1,15 @@
-const crypto = require('crypto');
-const fs = require('fs');
 const { Router } = require('express');
 const multer = require('multer');
-const config = require('../config/default');
 const ctrl = require('../controllers/adminController');
 const { adminAuth, loginLimiter } = require('../middlewares/auth.middleware');
 
-const IMAGE_TYPES = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp', 'image/gif': '.gif' };
+const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 
+// Rasm xotirada qabul qilinib, bazaga yoziladi (Render'da doimiy disk yo'q)
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => {
-      fs.mkdirSync(config.paths.uploads, { recursive: true });
-      cb(null, config.paths.uploads);
-    },
-    filename: (req, file, cb) => {
-      cb(null, `${Date.now()}-${crypto.randomBytes(6).toString('hex')}${IMAGE_TYPES[file.mimetype]}`);
-    },
-  }),
+  storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => cb(null, Boolean(IMAGE_TYPES[file.mimetype])),
+  fileFilter: (req, file, cb) => cb(null, IMAGE_TYPES.has(file.mimetype)),
 });
 
 const router = Router();

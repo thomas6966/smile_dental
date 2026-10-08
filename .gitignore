@@ -6,6 +6,7 @@
 .env
 .env.*
 !.env.example
+render.env
 
 # --- O'rnatilgan paketlar (npm install qayta o'rnatadi) ---
 node_modules/
@@ -13,8 +14,12 @@ node_modules/
 # --- Yig'ilgan fayllar (npm run build qayta yaratadi) ---
 dist/
 dist-ssr/
+dist-vercel/
 .vite/
 *.local
+
+# --- Vercel CLI sozlamalari ---
+.vercel/
 
 # --- Admin Paneldan yuklangan rasmlar ---
 uploads/

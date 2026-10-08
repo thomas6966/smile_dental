@@ -1,5 +1,6 @@
 import { CircleCheck, ChevronRight } from 'lucide-react';
 import { useApp } from '../context.js';
+import { assetUrl } from '../api.js';
 import { formatPrice, pick } from '../i18n.js';
 import { categoryIcon, descriptionLines, discountPercent, doctorsForService } from '../utils.js';
 import Sheet from '../components/Sheet.jsx';
@@ -26,7 +27,7 @@ export default function ServiceSheet({ id }) {
     >
       <div className="sheet-hero">
         {service.imageUrl ? (
-          <img src={service.imageUrl} alt={pick(service, 'name', lang)} />
+          <img src={assetUrl(service.imageUrl)} alt={pick(service, 'name', lang)} />
         ) : (
           categoryIcon(data.categories, service.categoryId)
         )}

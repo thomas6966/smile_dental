@@ -195,6 +195,15 @@ model Notification {
   @@index([createdAt])
 }
 
+// Admin Paneldan yuklangan rasmlar (serverda doimiy disk bo'lmasa ham saqlanib qoladi)
+model Media {
+  id        Int      @id @default(autoincrement())
+  mimeType  String
+  size      Int
+  data      Bytes
+  createdAt DateTime @default(now())
+}
+
 model Broadcast {
   id        Int      @id @default(autoincrement())
   textUz    String

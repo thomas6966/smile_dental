@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs');
 
@@ -18,13 +19,44 @@ const bool = (key, def = false) => {
   if (!value) return def;
   return ['1', 'true', 'yes', 'on'].includes(value);
 };
+const noSlash = (value) => value.replace(/\/+$/, '');
+const originOf = (value) => {
+  try {
+    return new URL(value).origin;
+  } catch {
+    return '';
+  }
+};
+
+// Render.com serverida ishlayaptimi (Render bu o'zgaruvchilarni o'zi qo'yadi)
+const onRender = Boolean(process.env.RENDER);
+const botToken = env('BOT_TOKEN');
+const webAppUrl = noSlash(env('WEBAPP_URL'));
+const publicUrl = noSlash(env('PUBLIC_URL') || env('RENDER_EXTERNAL_URL'));
+const botMode = ['webhook', 'polling'].includes(env('BOT_MODE').toLowerCase())
+  ? env('BOT_MODE').toLowerCase()
+  : publicUrl
+    ? 'webhook'
+    : 'polling';
 
 const config = {
   env: env('NODE_ENV', 'development'),
   port: Number(env('PORT', '4000')) || 4000,
-  host: env('HOST', '127.0.0.1'),
-  botToken: env('BOT_TOKEN'),
-  webAppUrl: env('WEBAPP_URL').replace(/\/+$/, ''),
+  host: env('HOST', onRender ? '0.0.0.0' : '127.0.0.1'),
+  botToken,
+  webAppUrl,
+  publicUrl,
+  // webhook — server internetda (Render), polling — kompyuterda ishlaganda
+  botMode,
+  forcePolling: bool('FORCE_POLLING', false),
+  webhookSecret: env('WEBHOOK_SECRET') || crypto.createHash('sha256').update(`webhook:${botToken}`).digest('hex').slice(0, 40),
+  corsOrigins: [
+    ...env('CORS_ORIGINS')
+      .split(',')
+      .map((item) => originOf(item.trim()))
+      .filter(Boolean),
+    originOf(webAppUrl),
+  ].filter(Boolean),
   tunnel: ['auto', 'cloudflare', 'ngrok', 'none'].includes(env('TUNNEL').toLowerCase()) ? env('TUNNEL').toLowerCase() : 'auto',
   ngrok: {
     authtoken: env('NGROK_AUTHTOKEN'),
@@ -49,6 +81,7 @@ const config = {
     webAppUrl: '',
     botUsername: '',
     botOk: false,
+    ownsBot: true,
   },
 };
 
