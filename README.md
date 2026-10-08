@@ -31,6 +31,14 @@ npm start              # serverni ishga tushirish
 
 Yangi kompyuterda hammasini bir marta `setup.bat` qiladi.
 
+## Internetga joylash (deploy)
+
+Mini App va Admin Panel — Vercel'da, backend va bot — Render.com'da, baza — Neon'da. Barcha qadamlar: [DEPLOY.md](DEPLOY.md).
+
+- Mini App: https://smile-dental-rose.vercel.app
+- Admin Panel: https://smile-dental-rose.vercel.app/admin
+- Backend: https://smile-dental-api.onrender.com
+
 ## GitHub'dan yangi kompyuterga o'rnatish
 
 Parol va tokenlar GitHub'ga yuklanmaydi, shuning uchun `.env` faylini qo'lda yaratish kerak.

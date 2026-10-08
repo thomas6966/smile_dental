@@ -1,0 +1,17 @@
+name: Keep server awake
+
+# Render bepul tarifida server 15 daqiqa jim turganda uxlab qoladi.
+# Har 10 daqiqada so'rov yuborib, uni uyg'oq saqlaymiz (eslatmalar ishlashi uchun).
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping backend
+        run: |
+          code=$(curl -sS -m 90 -o /dev/null -w "%{http_code}" https://smile-dental-api.onrender.com/api/health || echo "000")
+          echo "Javob: $code"

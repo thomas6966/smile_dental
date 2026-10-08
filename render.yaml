@@ -1,0 +1,39 @@
+# Render.com uchun sozlama (Blueprint)
+# Dashboard → New → Blueprint → shu repozitoriyni tanlang
+services:
+  - type: web
+    name: smile-dental-api
+    runtime: node
+    plan: free
+    region: ohio # Neon bazasi ham us-east-2 (Ohio) da — shuning uchun eng tez variant
+    branch: main
+    buildCommand: npm ci && npx prisma generate && npx prisma migrate deploy
+    startCommand: node src/index.js
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      - key: NODE_ENV
+        value: production
+      - key: TIMEZONE_OFFSET
+        value: "5"
+      - key: DEV_AUTH
+        value: "false"
+      - key: TUNNEL
+        value: none
+      - key: WEBAPP_URL
+        value: https://smile-dental-rose.vercel.app
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: JWT_SECRET
+        generateValue: true
+      # Quyidagilarni Render o'zi so'raydi (maxfiy qiymatlar):
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: BOT_TOKEN
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
